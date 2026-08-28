@@ -20,7 +20,7 @@ export default async function handler(req, res) {
 
         // URL API Telegram yang sudah diperbaiki total (Anti Salah Baca Variabel)
         const urlTelegram = 'https://telegram.org' + TELEGRAM_TOKEN + '/sendMessage';
-        const response = await fetch(urlTelegram, {
+        const response = await fetch('https://telegram.org' + TELEGRAM_TOKEN + '/sendMessage', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
