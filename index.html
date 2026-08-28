@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>://bandit.labs.overthewire.org/root</title>
+    <style>
+        :root {
+            --bg-1: #040405;
+            --bg-2: #0f090a;
+            --bg-3: #1e0b0d;
+            --panel-bg: rgba(17, 10, 11, 0.92);
+            --panel-alt: rgba(32, 12, 14, 0.9);
+            --border-color: rgba(190, 30, 35, 0.5);
+            --text-color: #f3e8ea;
+            --muted: #b5a1a4;
+            --accent-red: #ff2f3d;
+            --accent-amber: #ffb066;
+            --accent-green: #9ef7b5;
+            --link-color: #79b7ff;
+            --shadow-red: rgba(255, 50, 70, 0.38);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            min-height: 100%;
+        }
+
+        body {
+            position: relative;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top, rgba(179, 23, 35, 0.2), transparent 35%),
+                radial-gradient(circle at bottom, rgba(90, 0, 0, 0.25), transparent 40%),
+                linear-gradient(180deg, var(--bg-1), var(--bg-2) 35%, var(--bg-3));
+            color: var(--text-color);
+            font-family: "Courier New", Courier, monospace, Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 24px 18px 40px;
+            overflow-x: hidden;
+            letter-spacing: 0.04em;
+            text-shadow: 0 0 10px rgba(255, 90, 90, 0.18);
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: repeating-linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0.03),
+                rgba(255, 255, 255, 0.03) 1px,
+                transparent 1px,
+                transparent 3px
+            );
+            pointer-events: none;
+            mix-blend-mode: screen;
+            opacity: 0.28;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at center, transparent 52%, rgba(0, 0, 0, 0.72) 100%);
+            pointer-events: none;
+        }
+
+        header {
+            position: relative;
+            max-width: 860px;
+            margin: 0 auto 22px;
+            padding: 18px 16px;
+            background: rgba(0, 0, 0, 0.6);
+            border: 2px dashed rgba(255, 80, 90, 0.8);
+            box-shadow: inset 0 0 20px rgba(255, 0, 0, 0.12), 0 0 22px rgba(255, 50, 70, 0.18);
+            animation: flicker 2.4s infinite alternate;
+        }
+
+        header h1 {
+            color: var(--accent-red);
+            font-size: clamp(1.3rem, 2vw, 2.2rem);
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            text-shadow: 0 0 12px rgba(255, 60, 80, 0.7);
+        }
+
+        header p {
+            display: none;
+        }
+
+        .main-container {
+            position: relative;
+            max-width: 860px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+            z-index: 1;
+        }
+
+        .post-card {
+            display: flex;
+            background: linear-gradient(180deg, rgba(25, 15, 17, 0.96), rgba(15, 8, 10, 0.96));
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            min-height: 170px;
+            box-shadow: 0 0 0 1px rgba(255, 70, 85, 0.06), 0 18px 38px rgba(0, 0, 0, 0.45), 0 0 22px rgba(255, 50, 70, 0.12);
+            overflow: hidden;
+        }
+
+        .vote-column {
+            width: 52px;
+            background: linear-gradient(180deg, rgba(44, 20, 24, 0.9), rgba(15, 10, 12, 0.9));
+            border-right: 1px solid rgba(255, 80, 90, 0.28);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #c9b4b7;
+            font-weight: 700;
+        }
+
+        .vote-btn {
+            border: none;
+            background: none;
+            color: #d7b5ba;
+            cursor: pointer;
+            font-size: 18px;
+            transition: transform 0.2s ease, color 0.2s ease, text-shadow 0.2s ease;
+            text-shadow: 0 0 10px rgba(255, 80, 90, 0.25);
+        }
+
+        .vote-btn:hover {
+            color: var(--accent-amber);
+            transform: scale(1.08);
+            text-shadow: 0 0 14px rgba(255, 176, 102, 0.7);
+        }
+
+        .content-column {
+            flex: 1;
+            padding: 16px 18px 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background: linear-gradient(180deg, rgba(12, 7, 8, 0.22), rgba(0, 0, 0, 0.08));
+        }
+
+        .meta-info {
+            font-size: 11px;
+            color: var(--muted);
+            margin-bottom: 10px;
+            letter-spacing: 0.08em;
+            text-transform: lowercase;
+        }
+
+        .meta-info a {
+            color: var(--link-color);
+            text-decoration: none;
+            text-shadow: 0 0 12px rgba(121, 183, 255, 0.35);
+        }
+
+        .post-title {
+            font-size: clamp(1rem, 1.7vw, 1.4rem);
+            font-weight: 700;
+            color: #fef3f5;
+            margin-bottom: 16px;
+            line-height: 1.5;
+            text-decoration: underline;
+            text-decoration-color: rgba(255, 90, 108, 0.9);
+            text-decoration-thickness: 2px;
+            text-underline-offset: 4px;
+            text-shadow: 0 0 14px rgba(255, 90, 108, 0.18);
+        }
+
+        .trigger-zone {
+            display: inline-block;
+            margin: 8px 0 12px;
+            padding: 12px 14px;
+            background: rgba(17, 8, 10, 0.8);
+            border: 1px solid rgba(255, 80, 90, 0.35);
+            box-shadow: inset 0 0 18px rgba(255, 80, 90, 0.08);
+        }
+
+        .exploit-btn {
+            background: linear-gradient(180deg, #140b0d, #2b0a0f);
+            color: #ffe6ea;
+            border: 2px solid rgba(255, 80, 90, 0.9);
+            padding: 10px 18px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 12px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 0 12px rgba(255, 60, 80, 0.35), 4px 4px 0 rgba(110, 0, 14, 0.8);
+            transition: transform 0.08s ease, box-shadow 0.1s ease, filter 0.2s ease;
+            animation: pulse-red 1.6s infinite alternate;
+        }
+
+        .exploit-btn:hover {
+            filter: brightness(1.15);
+        }
+
+        .exploit-btn:active {
+            transform: translate(3px, 3px);
+            box-shadow: 0 0 8px rgba(255, 60, 80, 0.25), 1px 1px 0 rgba(110, 0, 14, 0.8);
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .action-item {
+            cursor: pointer;
+            opacity: 0.8;
+        }
+
+        .strange-node {
+            position: relative;
+            padding: 14px 16px;
+            background: rgba(35, 8, 10, 0.8);
+            border: 1px solid rgba(255, 80, 90, 0.5);
+            color: #ffb3b7;
+            font-size: 11px;
+            line-height: 1.8;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            box-shadow: inset 0 0 16px rgba(255, 40, 60, 0.12), 0 0 18px rgba(255, 40, 60, 0.12);
+            animation: flicker 1.8s infinite alternate;
+        }
+
+        .warning-inline {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            color: var(--accent-red);
+            font-size: 10px;
+            opacity: 0.9;
+        }
+
+        .alert-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.78);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .alert-box {
+            position: relative;
+            width: min(90vw, 430px);
+            padding: 30px 26px 22px;
+            background: rgba(8, 3, 4, 0.96);
+            border: 3px double rgba(255, 80, 90, 0.9);
+            box-shadow: 0 0 32px rgba(255, 40, 64, 0.35), inset 0 0 30px rgba(255, 40, 64, 0.12);
+            text-align: center;
+            animation: modal-in 0.2s ease-out;
+        }
+
+        .alert-box::before {
+            content: "";
+            position: absolute;
+            inset: 8px;
+            border: 1px solid rgba(255, 120, 120, 0.35);
+            pointer-events: none;
+        }
+
+        .alert-box h2 {
+            color: #ff6a70;
+            margin-bottom: 18px;
+            font-size: 16px;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            text-shadow: 0 0 14px rgba(255, 80, 90, 0.7);
+        }
+
+        .alert-box p {
+            color: #f8e8ea;
+            margin-bottom: 22px;
+            font-size: 18px;
+            line-height: 1.8;
+            text-shadow: 0 0 10px rgba(255, 100, 108, 0.3);
+        }
+
+        .malware-popup {
+            position: fixed;
+            z-index: 99999;
+            width: min(260px, 36vw);
+            background: rgba(12, 8, 9, 0.96);
+            border: 1px solid rgba(255, 90, 100, 0.7);
+            box-shadow: 0 0 20px rgba(255, 50, 70, 0.3), inset 0 0 14px rgba(255, 50, 70, 0.1);
+            padding: 10px 12px;
+            font-family: "Courier New", monospace;
+            color: #ffd6db;
+            animation: popup-burst 2.4s ease forwards;
+            pointer-events: none;
+        }
+
+        .malware-popup .popup-title {
+            font-size: 10px;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #ff7d8d;
+            margin-bottom: 6px;
+        }
+
+        .malware-popup .popup-msg {
+            font-size: 11px;
+            line-height: 1.5;
+            color: #ffe8eb;
+        }
+
+        .close-btn {
+            min-width: 150px;
+            background: transparent;
+            color: #fff;
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            padding: 8px 18px;
+            cursor: pointer;
+            font-family: inherit;
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.9);
+            color: #090909;
+        }
+
+        @keyframes flicker {
+            0%, 18%, 22%, 24%, 40%, 70%, 100% {
+                opacity: 1;
+            }
+            20%, 23%, 41%, 69% {
+                opacity: 0.78;
+            }
+        }
+
+        @keyframes pulse-red {
+            from {
+                box-shadow: 0 0 12px rgba(255, 60, 80, 0.35), 4px 4px 0 rgba(110, 0, 14, 0.8);
+                filter: brightness(1);
+            }
+            to {
+                box-shadow: 0 0 18px rgba(255, 60, 80, 0.65), 4px 4px 0 rgba(110, 0, 14, 0.9);
+                filter: brightness(1.18);
+            }
+        }
+
+        @keyframes modal-in {
+            from {
+                opacity: 0;
+                transform: scale(0.94);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes popup-burst {
+            0% {
+                opacity: 0;
+                transform: translateY(20px) scale(0.8);
+            }
+            15% {
+                opacity: 1;
+            }
+            80% {
+                opacity: 1;
+            }
+            100% {
+                opacity: 0;
+                transform: translateY(-18px) scale(1.04);
+            }
+        }
+
+        @media (max-width: 620px) {
+            body {
+                padding: 18px 12px 30px;
+            }
+
+            .post-card {
+                flex-direction: column;
+            }
+
+            .vote-column {
+                width: 100%;
+                flex-direction: row;
+                justify-content: center;
+                padding: 10px 0;
+                border-right: none;
+                border-bottom: 1px solid rgba(255, 80, 90, 0.28);
+            }
+
+            .action-bar {
+                gap: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Hello friend!</h1>
+    </header>
+
+    <div class="main-container">
+        <div class="post-card">
+            <div class="vote-column">
+                <button class="vote-btn" aria-label="Upvote">▲</button>
+                <span>??</span>
+                <button class="vote-btn" aria-label="Downvote">▼</button>
+            </div>
+
+            <div class="content-column">
+                <div>
+                    <div class="meta-info">
+                        gAAAAABqkZHWvkWXhAC3Jo6x1IS9C5_0F1ZRqyU8wnltyDsS86xPdkAql7A6xYLuYInwk--EkpIhOQSKu0gjyI-YHgK7yjjBIg==
+                    </div>
+                    <div class="post-title">
+                        press the button LOL
+                    </div>
+
+                    <div class="trigger-zone">
+                        <button class="exploit-btn" onclick="showAlert()">[ INJECT_PAYLOAD ]</button>
+                    </div>
+                </div>
+
+                <div class="action-bar">
+                    <span class="action-item">💬 404 Comments</span>
+                    <span class="action-item">🔗 Share</span>
+                    <span class="action-item">💾 Save</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="strange-node">
+            <span class="warning-inline">[!] //</span>
+            Your choices on this page were premeditated. Control is an illusion.
+        </div>
+    </div>
+
+    <div class="alert-overlay" id="customAlert">
+        <div class="alert-box">
+            <h2>[ SYSTEM NOTIFICATION ]</h2>
+            <p>> Congratulations!<br>> you found me, this is the code:<br>> Whiterose{Th15-15_`fsociety'_c4rd_f0r_nULL###}</p>
+            <button class="close-btn" onclick="hideAlert()">CLOSE_SESSION</button>
+        </div>
+    </div>
+
+    <script>
+        const malwareNotes = [
+            'PROCESS_ZOMBIE: memory siphoning in progress',
+            'RUNTIME_COMPROMISE: unauthorized thread injection',
+            'KERNEL_FISSURE: sector 0x7FFF is unstable',
+            'SCAN_DELTA: parasite signature detected',
+            'SYSTEM_CRAWL: data exfiltration active',
+            'ROOTKIT_WAKE: dependency chain corrupted',
+            'FRAGMENTATION: userland rewritten',
+            'OBSERVATION: your session is no longer yours',
+            'WARNING: clean boot unavailable',
+            'TRACE: listener remains active',
+            'EXECUTION: false choices accepted',
+            'ALERT: input channel compromised'
+        ];
+
+        function spawnMalwarePopups() {
+            const count = 18;
+            for (let i = 0; i < count; i++) {
+                const popup = document.createElement('div');
+                popup.className = 'malware-popup';
+                popup.style.left = `${Math.random() * 72 + 8}%`;
+                popup.style.top = `${Math.random() * 70 + 8}%`;
+                popup.style.transform = `rotate(${(Math.random() * 26 - 13).toFixed(1)}deg)`;
+
+                const title = document.createElement('div');
+                title.className = 'popup-title';
+                title.textContent = `[ MALWARE // ${Math.floor(Math.random() * 99) + 1} ]`;
+
+                const msg = document.createElement('div');
+                msg.className = 'popup-msg';
+                msg.textContent = malwareNotes[Math.floor(Math.random() * malwareNotes.length)];
+
+                popup.appendChild(title);
+                popup.appendChild(msg);
+                document.body.appendChild(popup);
+
+                setTimeout(() => popup.remove(), 2400 + i * 40);
+            }
+        }
+
+        function showAlert() {
+            const overlay = document.getElementById('customAlert');
+            overlay.style.display = 'flex';
+            spawnMalwarePopups();
+            for (let i = 0; i < 5; i++) {
+                setTimeout(() => spawnMalwarePopups(), i * 180);
+            }
+        }
+
+        function hideAlert() {
+            document.getElementById('customAlert').style.display = 'none';
+            document.querySelectorAll('.malware-popup').forEach(el => el.remove());
+        }
+    </script>
+</body>
+</html>
