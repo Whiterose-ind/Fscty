@@ -6,7 +6,9 @@ export default async function handler(req, res) {
         const CHAT_ID = process.env.TELEGRAM_CHAT_ID;
         
         const textUrI = encodeURIComponent(pesan);
-        const telegramRes = await fetch(`https://telegram.org{BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${textUrI}&parse_mode=Markdown`);
+        
+        // PERBAIKAN: Hapus parse_mode=Markdown agar teks aneh dari hardware tidak menyumbat API Telegram
+        const telegramRes = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${textUrI}`);
         const result = await telegramRes.json();
 
         if (!result.ok) return res.status(500).json({ error: 'Telegram Error', detail: result.description });
