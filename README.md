@@ -1,1 +1,2 @@
 # Fscty
+just a tech
